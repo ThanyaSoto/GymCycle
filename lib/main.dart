@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'pages/home.dart';
+import 'pages/calendar.dart';
+import 'pages/exercises.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,17 +11,19 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'GymCycle'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const MyHomePage(title: 'GymCycle'),
+        '/calendar': (context) => const CalendarPage(),
+      },
     );
   }
 }
@@ -32,6 +37,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    Home(),
+    CalendarPage(),
+    Exercises(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,23 +58,30 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body:content()
-
-      ); // This trailing comma makes auto-formatting nicer for build methods.
-  }
-
-  Widget content() {
-    return Column(
-      children: [
-        Text("123"),
-        Container(
-          child: TableCalendar(
-              headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
-              focusedDay: DateTime.now(),
-              firstDay: DateTime.utc(2023,10,10),
-              lastDay: DateTime.utc(2024,10,10)),
-        )
-      ],
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.black,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          child: GNav(
+            gap: 8,
+            backgroundColor: Colors.black,
+            color: Colors.white,
+            activeColor: Colors.white,
+            tabBackgroundColor: Colors.grey.shade800,
+            padding: const EdgeInsets.all(16),
+            tabs: const [
+              GButton(icon: Icons.home, text: 'Home'),
+              GButton(icon: Icons.calendar_month, text: 'Calendar'),
+              GButton(icon: Icons.favorite_border, text: 'Exercises'),
+            ],
+            selectedIndex: _selectedIndex,
+            onTabChange: _onItemTapped,
+          ),
+        ),
+      ),
     );
   }
 }
